@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة التحكم — مقسوم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">مقسوم</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">لوحة التحكم</a>
+    </nav>
+    <a href="data-entry.html" class="btn btn-primary">بيانات جديدة</a>
+  </div>
+</header>
+
+<main class="page-main">
+  <div class="container">
+
+    <div class="page-head">
+      <h1>لوحة التحكم</h1>
+      <p>هذي نظرة سريعة على وضع تجارتك حسب آخر بيانات أدخلتها.</p>
+    </div>
+
+    <!-- تُعرض إذا ما فيه بيانات محفوظة -->
+    <div id="emptyState" class="empty-state" hidden>
+      <h2>ما فيه بيانات محفوظة بعد</h2>
+      <p>أدخل بيانات تجارتك الآن عشان يحسب لك مقسوم ربحك الحقيقي.</p>
+      <a href="data-entry.html" class="btn btn-primary btn-lg">أدخل بيانات تجارتك</a>
+    </div>
+
+    <!-- تُعرض إذا فيه بيانات محفوظة -->
+    <div id="summaryState" hidden>
+      <div class="summary-grid">
+        <div class="stat-card">
+          <p class="stat-label">صافي الربح</p>
+          <p class="stat-value" id="statNetProfit">—</p>
+        </div>
+        <div class="stat-card is-accent">
+          <p class="stat-label">هامش الربح</p>
+          <p class="stat-value" id="statMargin">—</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">آخر تحديث للبيانات</p>
+          <p class="stat-value" id="statUpdated" style="font-size:1.05rem;">—</p>
+        </div>
+      </div>
+
+      <div class="dashboard-actions">
+        <a href="results.html" class="btn btn-primary">عرض تفاصيل النتائج</a>
+        <a href="data-entry.html" class="btn btn-ghost">تعديل البيانات</a>
+        <button type="button" id="btnClearData" class="btn btn-danger-ghost">مسح البيانات والبدء من جديد</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <span class="brand">مقسوم</span>
+    <p>مع مقسوم، التاجر مقسّم أرباحه وضامنها</p>
+  </div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+  (function () {
+    const data = maqsoumLoadData();
+    const emptyState = document.getElementById("emptyState");
+    const summaryState = document.getElementById("summaryState");
+
+    if (!data) {
+      emptyState.hidden = false;
+      return;
+    }
+
+    summaryState.hidden = false;
+
+    const results = maqsoumCalculateResults(data);
+
+    document.getElementById("statNetProfit").textContent = maqsoumFormatNumber(results.netProfit, 0);
+    document.getElementById("statMargin").textContent = maqsoumFormatPercent(results.profitMargin);
+
+    if (data.saved_at) {
+      const d = new Date(data.saved_at);
+      document.getElementById("statUpdated").textContent = d.toLocaleDateString("ar-EG", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } else {
+      document.getElementById("statUpdated").textContent = "غير معروف";
+    }
+
+    document.getElementById("btnClearData").addEventListener("click", function () {
+      const sure = confirm("هل أنت متأكد من مسح كل البيانات المحفوظة؟ لا يمكن التراجع عن هذا.");
+      if (sure) {
+        maqsoumClearData();
+        window.location.href = "data-entry.html";
+      }
+    });
+  })();
+</script>
+</body>
+</html>
