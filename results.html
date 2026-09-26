@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>النتائج — مقسوم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">مقسوم</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">لوحة التحكم</a>
+    </nav>
+    <a href="data-entry.html" class="btn btn-ghost">تعديل البيانات</a>
+  </div>
+</header>
+
+<main class="page-main">
+  <div class="container">
+
+    <div class="page-head">
+      <h1>نتائج تجارتك</h1>
+      <p>هذي النتائج مبنية على آخر بيانات حفظتها في مقسوم.</p>
+    </div>
+
+    <!-- تظهر فقط إذا ما فيه بيانات محفوظة -->
+    <div id="noDataState" class="empty-state" hidden>
+      <h2>ما فيه بيانات لعرضها</h2>
+      <p>لازم تدخل بيانات تجارتك أول عشان يحسب لك مقسوم النتائج.</p>
+      <a href="data-entry.html" class="btn btn-primary btn-lg">أدخل بيانات تجارتك</a>
+    </div>
+
+    <div id="resultsContent" hidden>
+
+      <div class="results-grid">
+        <div class="stat-card">
+          <p class="stat-label">إجمالي الإيرادات</p>
+          <p class="stat-value" id="rRevenue">—</p>
+        </div>
+        <div class="stat-card is-danger">
+          <p class="stat-label">إجمالي التكاليف</p>
+          <p class="stat-value" id="rCosts">—</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">صافي الربح</p>
+          <p class="stat-value" id="rNetProfit">—</p>
+        </div>
+        <div class="stat-card is-accent">
+          <p class="stat-label">هامش الربح</p>
+          <p class="stat-value" id="rMargin">—</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">تكلفة الطلب الواحد</p>
+          <p class="stat-value" id="rCostPerOrder">—</p>
+        </div>
+        <div class="stat-card is-accent" id="capitalCard" hidden>
+          <p class="stat-label">نسبة استرداد رأس المال</p>
+          <p class="stat-value" id="rCapitalRecovery">—</p>
+          <p class="stat-note" id="rCapitalRemainingNote"></p>
+        </div>
+      </div>
+
+      <div class="breakdown-card">
+        <h2>توزيع مصاريفك</h2>
+        <p>نسبة كل بند من إجمالي التكاليف.</p>
+        <div class="split-bar" id="breakdownBar"></div>
+        <ul class="split-legend" id="breakdownLegend"></ul>
+      </div>
+
+      <div class="analysis-card">
+        <h2>تحليل بسيط</h2>
+        <ul class="analysis-list" id="analysisList"></ul>
+      </div>
+
+      <div class="results-actions">
+        <a href="dashboard.html" class="btn btn-primary">رجوع للوحة التحكم</a>
+        <a href="data-entry.html" class="btn btn-ghost">تعديل البيانات</a>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <span class="brand">مقسوم</span>
+    <p>مع مقسوم، التاجر مقسّم أرباحه وضامنها</p>
+  </div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+  (function () {
+    const data = maqsoumLoadData();
+    if (!data) {
+      document.getElementById("noDataState").hidden = false;
+      return;
+    }
+
+    document.getElementById("resultsContent").hidden = false;
+
+    const results = maqsoumCalculateResults(data);
+
+    document.getElementById("rRevenue").textContent = maqsoumFormatNumber(results.revenue);
+    document.getElementById("rCosts").textContent = maqsoumFormatNumber(results.totalCosts);
+    document.getElementById("rNetProfit").textContent = maqsoumFormatNumber(results.netProfit);
+    document.getElementById("rMargin").textContent = maqsoumFormatPercent(results.profitMargin);
+    document.getElementById("rCostPerOrder").textContent =
+      results.ordersCount > 0 ? maqsoumFormatNumber(results.costPerOrder, 2) : "—";
+
+    if (results.capitalRecoveryPercent !== null) {
+      document.getElementById("capitalCard").hidden = false;
+      document.getElementById("rCapitalRecovery").textContent = maqsoumFormatPercent(
+        results.capitalRecoveryPercent
+      );
+      document.getElementById("rCapitalRemainingNote").textContent =
+        results.capitalRemaining > 0
+          ? "المتبقي تقريبًا " + maqsoumFormatNumber(results.capitalRemaining)
+          : "تم استرداد رأس المال بالكامل";
+    }
+
+    // شريط توزيع التكاليف
+    const colors = ["#8A8478", "#4A6FA5", "#C89B3C", "#1F6F5C", "#7A5C8E", "#B5533C"];
+    const bar = document.getElementById("breakdownBar");
+    const legend = document.getElementById("breakdownLegend");
+
+    if (results.totalCosts > 0) {
+      results.costBreakdown
+        .filter((item) => item.value > 0)
+        .forEach((item, index) => {
+          const seg = document.createElement("span");
+          seg.className = "seg";
+          seg.style.width = item.percentOfCosts + "%";
+          seg.style.background = colors[index % colors.length];
+          seg.title = item.label;
+          seg.textContent = item.percentOfCosts >= 8 ? maqsoumFormatPercent(item.percentOfCosts) : "";
+          bar.appendChild(seg);
+
+          const li = document.createElement("li");
+          const dot = document.createElement("span");
+          dot.className = "legend-dot";
+          dot.style.background = colors[index % colors.length];
+          li.appendChild(dot);
+          li.appendChild(
+            document.createTextNode(
+              item.label + " — " + maqsoumFormatPercent(item.percentOfCosts)
+            )
+          );
+          legend.appendChild(li);
+        });
+    } else {
+      bar.style.background = "var(--color-border)";
+      const li = document.createElement("li");
+      li.textContent = "ما فيه تكاليف مسجّلة بعد.";
+      legend.appendChild(li);
+    }
+
+    // التحليل البسيط
+    const analysisList = document.getElementById("analysisList");
+    maqsoumBuildAnalysis(results).forEach(function (note) {
+      const li = document.createElement("li");
+      li.textContent = note;
+      analysisList.appendChild(li);
+    });
+  })();
+</script>
+</body>
+</html>
