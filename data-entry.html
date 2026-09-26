@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إدخال بيانات التجارة — مقسوم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">مقسوم</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">لوحة التحكم</a>
+    </nav>
+    <a href="dashboard.html" class="btn btn-ghost">رجوع للوحة التحكم</a>
+  </div>
+</header>
+
+<main class="page-main">
+  <div class="container">
+
+    <div class="page-head">
+      <h1>بيانات تجارتك</h1>
+      <p>عبّي الأرقام قدر الإمكان. أي حقل تتركه فارغ يُحسب كصفر. كل الأرقام بدون فواصل أو رموز.</p>
+    </div>
+
+    <div id="formError" class="form-error"></div>
+
+    <form id="businessForm" class="form-card" novalidate>
+
+      <fieldset>
+        <legend>بيانات أساسية</legend>
+        <div class="field-grid">
+          <div class="field">
+            <label for="capital">رأس المال</label>
+            <input type="number" id="capital" name="capital" min="0" step="any" inputmode="decimal">
+            <span class="hint">المبلغ الذي بدأت فيه تجارتك (اختياري، يُستخدم لحساب الاسترداد)</span>
+          </div>
+          <div class="field">
+            <label for="orders_count">عدد الطلبات</label>
+            <input type="number" id="orders_count" name="orders_count" min="0" step="1" inputmode="numeric">
+            <span class="hint">عدد الطلبات خلال نفس الفترة</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>الإيرادات</legend>
+        <div class="field-grid">
+          <div class="field">
+            <label for="sales_revenue">إجمالي المبيعات <span aria-hidden="true">*</span></label>
+            <input type="number" id="sales_revenue" name="sales_revenue" min="0" step="any" inputmode="decimal">
+            <span class="hint">إجمالي قيمة المبيعات قبل خصم أي تكاليف</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>التكاليف</legend>
+        <div class="field-grid">
+          <div class="field">
+            <label for="cost_suppliers">تكلفة الموردين</label>
+            <input type="number" id="cost_suppliers" name="cost_suppliers" min="0" step="any" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="cost_distributors">الموزعين والعمولات</label>
+            <input type="number" id="cost_distributors" name="cost_distributors" min="0" step="any" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="shipping_cost">الشحن</label>
+            <input type="number" id="shipping_cost" name="shipping_cost" min="0" step="any" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="packaging_cost">التغليف</label>
+            <input type="number" id="packaging_cost" name="packaging_cost" min="0" step="any" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="marketing_cost">التسويق</label>
+            <input type="number" id="marketing_cost" name="marketing_cost" min="0" step="any" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="other_costs">مصاريف أخرى</label>
+            <input type="number" id="other_costs" name="other_costs" min="0" step="any" inputmode="decimal">
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-footer">
+        <button type="submit" class="btn btn-primary btn-lg">احسب النتائج واحفظها</button>
+        <span class="hint">بياناتك تُحفظ في متصفحك فقط، ولا تُرسل لأي جهة خارجية.</span>
+      </div>
+    </form>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <span class="brand">مقسوم</span>
+    <p>مع مقسوم، التاجر مقسّم أرباحه وضامنها</p>
+  </div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script>
+  (function () {
+    const form = document.getElementById("businessForm");
+    const errorBox = document.getElementById("formError");
+
+    // إذا فيه بيانات محفوظة سابقًا، نعبّي النموذج فيها عشان يقدر التاجر يعدّلها
+    const existing = maqsoumLoadData();
+    if (existing) {
+      Object.keys(existing).forEach(function (key) {
+        const input = form.elements.namedItem(key);
+        if (input) input.value = existing[key];
+      });
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      errorBox.classList.remove("is-visible");
+
+      const fields = [
+        "capital", "orders_count", "sales_revenue",
+        "cost_suppliers", "cost_distributors",
+        "shipping_cost", "packaging_cost",
+        "marketing_cost", "other_costs",
+      ];
+
+      const data = {};
+      let hasNegative = false;
+
+      fields.forEach(function (key) {
+        const raw = form.elements.namedItem(key).value;
+        const value = raw === "" ? 0 : Number(raw);
+        if (value < 0) hasNegative = true;
+        data[key] = value;
+      });
+
+      if (hasNegative) {
+        errorBox.textContent = "لا يمكن إدخال أرقام سالبة. رجاءً راجع الحقول وحاول مرة أخرى.";
+        errorBox.classList.add("is-visible");
+        return;
+      }
+
+      if (data.sales_revenue === 0) {
+        errorBox.textContent = "رجاءً أدخل قيمة المبيعات على الأقل حتى يقدر مقسوم يحسب لك النتائج.";
+        errorBox.classList.add("is-visible");
+        return;
+      }
+
+      data.saved_at = new Date().toISOString();
+      maqsoumSaveData(data);
+      window.location.href = "results.html";
+    });
+  })();
+</script>
+</body>
+</html>
