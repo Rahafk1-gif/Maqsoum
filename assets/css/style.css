@@ -1,0 +1,232 @@
+/* =========================================================
+   مقسوم — الملف الرئيسي للتصميم (نسخة منقّحة: هوية متناسقة وعصرية)
+   ========================================================= */
+
+:root{
+  --color-bg: #F6F4EE;
+  --color-surface: #FFFFFF;
+  --color-ink: #16211D;
+  --color-ink-soft: #45524C;
+  --color-muted: #6E786F;
+  --color-border: #E1DCCC;
+
+  --color-primary: #175E4C;
+  --color-primary-dark: #0F4436;
+  --color-primary-soft: #E6EFEA;
+
+  --color-accent: #B4863A;
+  --color-accent-soft: #F3E8CF;
+
+  --color-danger: #A8503A;
+  --color-danger-soft: #F3E2DB;
+
+  --font-head: "Tajawal", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans Arabic", "Segoe UI", sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+  --container-w: 1140px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 18px;
+  --space-5: 26px;
+  --space-6: 36px;
+  --space-7: 52px;
+  --space-8: 76px;
+
+  --shadow-sm: 0 1px 2px rgba(22, 33, 29, .06), 0 1px 1px rgba(22, 33, 29, .04);
+  --shadow-md: 0 10px 24px rgba(22, 33, 29, .08);
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html{ scroll-behavior: smooth; }
+
+body{
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3{
+  font-family: var(--font-head);
+  color: var(--color-ink);
+  line-height: 1.25;
+  margin: 0 0 .45em;
+  letter-spacing: -.01em;
+}
+
+h1{ font-size: clamp(2rem, 4.2vw, 3.1rem); font-weight: 800; }
+h2{ font-size: clamp(1.4rem, 2.6vw, 1.85rem); font-weight: 700; }
+h3{ font-size: 1.1rem; font-weight: 700; }
+
+p{ margin: 0 0 1em; color: var(--color-ink-soft); }
+
+a{ color: inherit; }
+
+ul{ margin: 0; padding: 0; list-style: none; }
+
+/* أرقام بعرض ثابت لمظهر مالي مرتّب */
+.stat-value, .seg, .step-num, .btn{ font-variant-numeric: tabular-nums; }
+
+.container{
+  max-width: var(--container-w);
+  margin: 0 auto;
+  padding: 0 22px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible{
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------- الأزرار ---------------- */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: .97rem;
+  text-decoration: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+}
+.btn:active{ transform: translateY(1px); }
+
+.btn-primary{ background: var(--color-primary); color: #fff; }
+.btn-primary:hover{ background: var(--color-primary-dark); }
+
+.btn-ghost{ background: transparent; border-color: var(--color-border); color: var(--color-ink); }
+.btn-ghost:hover{ border-color: var(--color-primary); color: var(--color-primary); }
+
+.btn-lg{ padding: 16px 32px; font-size: 1.03rem; border-radius: var(--radius-pill); }
+
+.btn-danger-ghost{ background: transparent; border-color: var(--color-danger); color: var(--color-danger); }
+.btn-danger-ghost:hover{ background: var(--color-danger); color: #fff; }
+
+/* ---------------- الهيدر ---------------- */
+.site-header{
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  transition: box-shadow .2s ease;
+}
+.site-header.is-scrolled{ box-shadow: var(--shadow-sm); }
+
+.header-inner{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 16px;
+}
+
+.brand{
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+.nav-links{ display: none; gap: 26px; font-weight: 600; }
+.nav-links a{ text-decoration: none; color: var(--color-ink-soft); }
+.nav-links a:hover{ color: var(--color-primary); }
+
+@media (min-width: 760px){ .nav-links{ display: flex; } }
+
+/* ---------------- البطل (Hero) ---------------- */
+.hero{ position: relative; padding-block: 64px 48px; overflow: hidden; isolation: isolate; }
+
+/* علامة القسمة الزخرفية — تعبّر عن هوية "مقسوم" بصريًا */
+.divide-mark{
+  position: absolute;
+  top: -60px;
+  inset-inline-start: -40px;
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 340px;
+  line-height: 1;
+  color: var(--color-primary);
+  opacity: .05;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-inner{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 44px;
+  align-items: center;
+}
+
+@media (min-width: 900px){
+  .hero-inner{ grid-template-columns: 1.1fr .9fr; }
+}
+
+.tagline{
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  display: inline-block;
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: .9rem;
+  margin-bottom: 20px;
+}
+
+.hero-sub{ font-size: 1.06rem; max-width: 46ch; }
+
+.hero-actions{ display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+
+/* بطاقة الشريط المقسّم داخل الـ Hero */
+.split-card{
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 26px;
+  box-shadow: var(--shadow-md);
+}
+
+.split-label{ font-size: .88rem; color: var(--color-muted); margin-bottom: 16px; }
+
+.split-bar{
+  display: flex;
+  width: 100%;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.seg{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: .74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: no-preference){ .seg{ transition: width .6s ease; } }
+
+.seg-cost{ background: #8A8478
